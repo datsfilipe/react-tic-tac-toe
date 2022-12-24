@@ -1,23 +1,25 @@
-import { useState } from 'react'
+import { updateSquare, updatePlayer, useAppDispatch, useAppSelector } from './stores/GameStore'
+import './App.css'
 import './App.css'
 
 function App() {
-  const [squarePositions, setSquarePositions] = useState<(number | string)[][]>([[0,0,0],[0,0,0],[0,0,0]])
-  const [player, setPlayer] = useState(0)
+  const dispatch = useAppDispatch()
+  const squarePositions = useAppSelector((state) => state.squarePositions)
+  const player = useAppSelector((state) => state.player)
 
   const handleClick = (row: number, column: number) => {
     if (squarePositions[row][column] !== 0) return
 
-    const newSquarePositions = squarePositions.map((row) => [...row])
     const move = player === 0 ? 'X' : 'O'
 
-    newSquarePositions[row][column] = move
+    dispatch(updateSquare({ row, column, value: move }))
+    dispatch(updatePlayer(player === 0 ? 1 : 0))
 
-    setSquarePositions(newSquarePositions)
+    // clone to a temp variable because redux take a little to apply the change
+    const tempSquarePositions: (number | string)[][] = squarePositions.map((row) => row.map((column) => column))
+    tempSquarePositions[row][column] = move
 
-    setPlayer((prev) => (prev === 0 ? 1 : 0))
-
-    checkWinner(newSquarePositions)
+    checkWinner(tempSquarePositions)
   }
 
   const checkWinner = (squarePositions: (number | string)[][]) => {
@@ -25,8 +27,16 @@ function App() {
 
     if (winner) {
       alert(`The winner is ${winner}`)
-      setSquarePositions([[0,0,0],[0,0,0],[0,0,0]])
-      setPlayer(0)
+      dispatch(updateSquare({ row: 0, column: 0, value: 0 }))
+      dispatch(updateSquare({ row: 0, column: 1, value: 0 }))
+      dispatch(updateSquare({ row: 0, column: 2, value: 0 }))
+      dispatch(updateSquare({ row: 1, column: 0, value: 0 }))
+      dispatch(updateSquare({ row: 1, column: 1, value: 0 }))
+      dispatch(updateSquare({ row: 1, column: 2, value: 0 }))
+      dispatch(updateSquare({ row: 2, column: 0, value: 0 }))
+      dispatch(updateSquare({ row: 2, column: 1, value: 0 }))
+      dispatch(updateSquare({ row: 2, column: 2, value: 0 }))
+      dispatch(updatePlayer(0))
     }
 
     return winner
@@ -66,20 +76,34 @@ function App() {
 
   return (
     <div className="App">
-      <div className="board">
-        {squarePositions.map((row, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {row.map((square, squareIndex) => (
-              <div
-                key={squareIndex}
-                className="square"
-                onClick={() => handleClick(rowIndex, squareIndex)}
-              >
-                {square === 0 ? '' : square}
-              </div>
-            ))}
-          </div>
-        ))}
+      <div className="grid">
+        <div className="square" onClick={() => handleClick(0, 0)}>{
+          squarePositions[0][0] === 0 ? '' : squarePositions[0][0]
+        }</div>
+        <div className="square" onClick={() => handleClick(0, 1)}>{
+          squarePositions[0][1] === 0 ? '' : squarePositions[0][1]
+        }</div>
+        <div className="square" onClick={() => handleClick(0, 2)}>{
+          squarePositions[0][2] === 0 ? '' : squarePositions[0][2]
+        }</div>
+        <div className="square" onClick={() => handleClick(1, 0)}>{
+          squarePositions[1][0] === 0 ? '' : squarePositions[1][0]
+        }</div>
+        <div className="square" onClick={() => handleClick(1, 1)}>{
+          squarePositions[1][1] === 0 ? '' : squarePositions[1][1]
+        }</div>
+        <div className="square" onClick={() => handleClick(1, 2)}>{
+          squarePositions[1][2] === 0 ? '' : squarePositions[1][2]
+        }</div>
+        <div className="square" onClick={() => handleClick(2, 0)}>{
+          squarePositions[2][0] === 0 ? '' : squarePositions[2][0]
+        }</div>
+        <div className="square" onClick={() => handleClick(2, 1)}>{
+          squarePositions[2][1] === 0 ? '' : squarePositions[2][1]
+        }</div>
+        <div className="square" onClick={() => handleClick(2, 2)}>{
+          squarePositions[2][2] === 0 ? '' : squarePositions[2][2]
+        }</div>
       </div>
     </div>
   )
