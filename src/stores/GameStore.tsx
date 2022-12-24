@@ -1,46 +1,29 @@
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { createSlice, configureStore, PayloadAction } from '@reduxjs/toolkit'
+import { atom } from 'jotai'
+
+type SquarePositions = (string | number)[][]
 
 type UpdateSquareParams = {
   row: number;
   column: number;
-  value: number | string;
+  value: string | number;
 }
 
-type SquarePositions = (number | string)[][]
+const squarePositionsAtom = atom<SquarePositions>([
+  [0, 0, 0],
+  [0, 0, 0],
+  [0, 0, 0]
+])
 
-const squarePositionsSlice = createSlice({
-  name: 'squarePositions',
-  initialState: [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-  reducers: {
-    updateSquare(state: SquarePositions, action: PayloadAction<UpdateSquareParams>) {
-      const { row, column, value } = action.payload
-      state[row][column] = value
-    }
-  }
+const playerAtom = atom(0)
+
+const updateSquareAtom = atom(null, (get, set, { row, column, value }: UpdateSquareParams) => {
+  const squarePositions = get(squarePositionsAtom)
+  squarePositions[row][column] = value
+  set(squarePositionsAtom, squarePositions)
 })
 
-const playerSlice = createSlice({
-  name: 'player',
-  initialState: 0,
-  reducers: {
-    updatePlayer(_, action: PayloadAction<number>) {
-      return action.payload
-    }
-  }
+const updatePlayerAtom = atom(null, (get, set, player: number) => {
+  set(playerAtom, player)
 })
 
-const store = configureStore({
-  reducer: {
-    squarePositions: squarePositionsSlice.reducer,
-    player: playerSlice.reducer
-  }
-})
-
-export const { updateSquare } = squarePositionsSlice.actions
-export const { updatePlayer } = playerSlice.actions
-type RootState = ReturnType<typeof store.getState>
-type AppDispatch = typeof store.dispatch
-export const useAppDispatch: () => AppDispatch = useDispatch
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
-export default store
+export { squarePositionsAtom, updateSquareAtom, playerAtom, updatePlayerAtom }

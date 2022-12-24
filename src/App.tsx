@@ -1,18 +1,20 @@
-import { updateSquare, updatePlayer, useAppDispatch, useAppSelector } from './stores/GameStore'
+import { squarePositionsAtom, updateSquareAtom, playerAtom, updatePlayerAtom } from './stores/GameStore'
+import { useAtom } from 'jotai'
 import './App.css'
 
 function App() {
-  const dispatch = useAppDispatch()
-  const squarePositions = useAppSelector((state) => state.squarePositions)
-  const player = useAppSelector((state) => state.player)
+  const [squarePositions,] = useAtom(squarePositionsAtom)
+  const [player,] = useAtom(playerAtom)
+  const [, updateSquareFn] = useAtom(updateSquareAtom)
+  const [, updatePlayerFn] = useAtom(updatePlayerAtom)
 
   const handleClick = (row: number, column: number) => {
     if (squarePositions[row][column] !== 0) return
 
     const move = player === 0 ? 'X' : 'O'
 
-    dispatch(updateSquare({ row, column, value: move }))
-    dispatch(updatePlayer(player === 0 ? 1 : 0))
+    updateSquareFn({ row, column, value: move })
+    updatePlayerFn(player === 0 ? 1 : 0)
 
     // clone to a temp variable because redux take a little to apply the change
     const tempSquarePositions: (number | string)[][] = squarePositions.map((row) => row.map((column) => column))
@@ -26,16 +28,16 @@ function App() {
 
     if (winner) {
       alert(`The winner is ${winner}`)
-      dispatch(updateSquare({ row: 0, column: 0, value: 0 }))
-      dispatch(updateSquare({ row: 0, column: 1, value: 0 }))
-      dispatch(updateSquare({ row: 0, column: 2, value: 0 }))
-      dispatch(updateSquare({ row: 1, column: 0, value: 0 }))
-      dispatch(updateSquare({ row: 1, column: 1, value: 0 }))
-      dispatch(updateSquare({ row: 1, column: 2, value: 0 }))
-      dispatch(updateSquare({ row: 2, column: 0, value: 0 }))
-      dispatch(updateSquare({ row: 2, column: 1, value: 0 }))
-      dispatch(updateSquare({ row: 2, column: 2, value: 0 }))
-      dispatch(updatePlayer(0))
+      updateSquareFn({ row: 0, column: 0, value: 0 })
+      updateSquareFn({ row: 0, column: 1, value: 0 })
+      updateSquareFn({ row: 0, column: 2, value: 0 })
+      updateSquareFn({ row: 1, column: 0, value: 0 })
+      updateSquareFn({ row: 1, column: 1, value: 0 })
+      updateSquareFn({ row: 1, column: 2, value: 0 })
+      updateSquareFn({ row: 2, column: 0, value: 0 })
+      updateSquareFn({ row: 2, column: 1, value: 0 })
+      updateSquareFn({ row: 2, column: 2, value: 0 })
+      updatePlayerFn(0)
     }
 
     return winner
