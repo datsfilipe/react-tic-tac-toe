@@ -1,6 +1,5 @@
 import { updateSquare, updatePlayer, useAppDispatch, useAppSelector } from './stores/GameStore'
 import './App.css'
-import './App.css'
 
 function App() {
   const dispatch = useAppDispatch()
